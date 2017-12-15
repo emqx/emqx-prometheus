@@ -64,7 +64,7 @@ handle_cast(_Msg, State) ->
 
 handle_info({timeout, R, ?TIMER_MSG}, S = #state{interval=I, timer_ref=R, push_gateway = Uri}) ->
     [Name, Ip] = string:tokens(atom_to_list(node()), "@"),
-    Url = lists:concat([Uri, "/metrics/job/", Name, "/instance/",Name, "~", Ip]),
+    Url = lists:concat([Uri, "/metrics/job/", Name, "/instance/",Name, "@", Ip]),
     Data = prometheus_text_format:format(),
     httpc:request(post, {Url, [], "text/plain", Data}, [{autoredirect, true}], []),
     Ref = erlang:start_timer(I, self(), ?TIMER_MSG),
