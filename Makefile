@@ -1,6 +1,6 @@
 PROJECT = emqx_statsd
 PROJECT_DESCRIPTION = Statsd for EMQ X
-PROJECT_VERSION = 2.4
+PROJECT_VERSION = 2.4.1
 
 DEPS = prometheus
 dep_prometheus = git https://github.com/turtleDeng/prometheus.erl master
