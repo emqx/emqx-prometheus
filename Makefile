@@ -1,12 +1,12 @@
 PROJECT = emqx_statsd
 PROJECT_DESCRIPTION = Statsd for EMQ X
-PROJECT_VERSION = 2.4.1
+PROJECT_VERSION = 3.0
 
 DEPS = prometheus
 dep_prometheus = git https://github.com/turtleDeng/prometheus.erl master
 
 BUILD_DEPS = emqx cuttlefish
-dep_emqx = git https://github.com/emqtt/emqttd X
+dep_emqx = git https://github.com/emqtt/emqttd emqx30
 dep_cuttlefish = git https://github.com/emqtt/cuttlefish develop
 
 ERLC_OPTS += +debug_info
