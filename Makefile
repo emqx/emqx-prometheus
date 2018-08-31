@@ -5,7 +5,7 @@ PROJECT_VERSION = 3.0
 NO_AUTOPATCH = prometheus.erl
 
 DEPS = prometheus
-dep_prometheus = git https://github.com/turtleDeng/prometheus.erl master
+dep_prometheus = git https://github.com/turtleDeng/prometheus.erl v3.1.1
 
 BUILD_DEPS = emqx cuttlefish
 dep_emqx = git https://github.com/emqtt/emqttd emqx30
