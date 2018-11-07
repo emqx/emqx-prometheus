@@ -148,10 +148,10 @@ emqx_collect(emqx_bytes_sent, Metrics) ->
     counter_metric(?C('bytes/sent', Metrics));
 
 %% clients
-emqx_collect(emqx_clients_count, Stats) ->
-    gauge_metric(?C('clients/count', Stats));
-emqx_collect(emqx_clients_max, Stats) ->
-    gauge_metric(?C('clients/max', Stats));
+emqx_collect(emqx_connections_count, Stats) ->
+    gauge_metric(?C('connections/count', Stats));
+emqx_collect(emqx_connections_max, Stats) ->
+    gauge_metric(?C('connections/max', Stats));
 
 %% retained
 emqx_collect(emqx_retained_count, Stats) ->
@@ -253,8 +253,8 @@ emqx_metrics() ->
      emqx_bytes_sent].
 
 emqx_stats() ->
-    [emqx_clients_count,
-     emqx_clients_max,
+    [emqx_connections_count,
+     emqx_connections_max,
      emqx_retained_count,
      emqx_retained_max,
      emqx_routes_count,
