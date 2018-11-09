@@ -246,6 +246,8 @@ emqx_collect(emqx_messages_qos2_sent, Metrics) ->
     counter_metric(?C('messages/qos2/sent', Metrics));
 emqx_collect(emqx_messages_qos2_dropped, Metrics) ->
     counter_metric(?C('messages/qos2/dropped', Metrics));
+emqx_collect(emqx_messages_qos2_forward, Metrics) ->
+    counter_metric(?C('messages/qos2/forward', Metrics));
 emqx_collect(emqx_message_forward, Metrics) ->
     counter_metric(?C('messages/forward', Metrics));
 emqx_collect(emqx_message_expired, Metrics) ->
@@ -307,6 +309,7 @@ emqx_messages() ->
      emqx_messages_qos2_received,
      emqx_messages_qos2_expired,
      emqx_messages_qos2_sent,
+     emqx_messages_qos2_dropped,
      emqx_messages_qos2_forward
     ].
 
