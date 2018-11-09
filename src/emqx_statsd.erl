@@ -95,13 +95,25 @@ add_collect_family(Name, Data, Callback, Type) ->
 create_schema(Name, Help, Data, Type) ->
   create_mf(Name, Help, Type, ?MODULE, Data).
 
+%% auth
+emqx_collect(emqx_packets_auth, Metrics) ->
+    counter_metric(?C('packets/auth', Metrics));
+
+%% received/sent
+emqx_collect(emqx_packets_received, Metrics) ->
+    counter_metric(?C('packets/received', Metrics));
+emqx_collect(emqx_packets_sent, Metrics) ->
+    counter_metric(?C('packets/sent', Metrics));
+
 %% connect/disconnect
 emqx_collect(emqx_packets_connect, Metrics) ->
     counter_metric(?C('packets/connect', Metrics));
 emqx_collect(emqx_packets_connack, Metrics) ->
     counter_metric(?C('packets/connack', Metrics));
-emqx_collect(emqx_packets_disconnect, Metrics) ->
-    counter_metric(?C('packets/disconnect', Metrics));
+emqx_collect(emqx_packets_disconnect_received, Metrics) ->
+    counter_metric(?C('packets/disconnect/received', Metrics));
+emqx_collect(emqx_packets_disconnect_sent, Metrics) ->
+    counter_metric(?C('packets/disconnect/sent', Metrics));
 
 %% sub/unsub
 emqx_collect(emqx_packets_subscribe, Metrics) ->
@@ -122,23 +134,31 @@ emqx_collect(emqx_packets_puback_received, Metrics) ->
     counter_metric(?C('packets/puback/received', Metrics));
 emqx_collect(emqx_packets_puback_sent, Metrics) ->
     counter_metric(?C('packets/puback/sent', Metrics));
+emqx_collect(emqx_packets_puback_missed, Metrics) ->
+    counter_metric(?C('packets/puback/missed', Metrics));
 emqx_collect(emqx_packets_pubrec_received, Metrics) ->
     counter_metric(?C('packets/pubrec/received', Metrics));
 emqx_collect(emqx_packets_pubrec_sent, Metrics) ->
     counter_metric(?C('packets/pubrec/sent', Metrics));
+emqx_collect(emqx_packets_pubrec_missed, Metrics) ->
+    counter_metric(?C('packets/pubrec/missed', Metrics));
 emqx_collect(emqx_packets_pubrel_received, Metrics) ->
     counter_metric(?C('packets/pubrel/received', Metrics));
 emqx_collect(emqx_packets_pubrel_sent, Metrics) ->
     counter_metric(?C('packets/pubrel/sent', Metrics));
+emqx_collect(emqx_packets_pubrel_missed, Metrics) ->
+    counter_metric(?C('packets/pubrel/missed', Metrics));
 emqx_collect(emqx_packets_pubcomp_received, Metrics) ->
     counter_metric(?C('packets/pubcomp/received', Metrics));
 emqx_collect(emqx_packets_pubcomp_sent, Metrics) ->
     counter_metric(?C('packets/pubcomp/sent', Metrics));
+emqx_collect(emqx_packets_pubcomp_missed, Metrics) ->
+    counter_metric(?C('packets/pubcomp/missed', Metrics));
 
 %% pingreq
 emqx_collect(emqx_packets_pingreq, Metrics) ->
     counter_metric(?C('packets/pingreq', Metrics));
-emqx_collect('emqx_packets_pingresp', Metrics) ->
+emqx_collect(emqx_packets_pingresp, Metrics) ->
     counter_metric(?C('packets/pingresp', Metrics));
 
 %% bytes
@@ -147,7 +167,7 @@ emqx_collect(emqx_bytes_received, Metrics) ->
 emqx_collect(emqx_bytes_sent, Metrics) ->
     counter_metric(?C('bytes/sent', Metrics));
 
-%% clients
+%% connections
 emqx_collect(emqx_connections_count, Stats) ->
     gauge_metric(?C('connections/count', Stats));
 emqx_collect(emqx_connections_max, Stats) ->
@@ -170,12 +190,6 @@ emqx_collect(emqx_sessions_count, Stats) ->
     gauge_metric(?C('sessions/count', Stats));
 emqx_collect(emqx_sessions_max, Stats) ->
     gauge_metric(?C('sessions/max', Stats));
-
-%% subscribers
-emqx_collect(emqx_subscribers_count, Stats) ->
-    gauge_metric(?C('subscribers/count', Stats));
-emqx_collect(emqx_subscribers_max, Stats) ->
-    gauge_metric(?C('subscribers/max', Stats));
 
 %% subscriptions
 emqx_collect(emqx_subscriptions_count, Stats) ->
@@ -226,8 +240,16 @@ emqx_collect(emqx_messages_qos1_sent, Metrics) ->
 
 emqx_collect(emqx_messages_qos2_received, Metrics) ->
     counter_metric(?C('messages/qos2/received', Metrics));
+emqx_collect(emqx_messages_qos2_expired, Metrics) ->
+    counter_metric(?C('messages/qos2/expired', Metrics));
 emqx_collect(emqx_messages_qos2_sent, Metrics) ->
-    counter_metric(?C('messages/qos2/sent', Metrics)).
+    counter_metric(?C('messages/qos2/sent', Metrics));
+emqx_collect(emqx_messages_qos2_dropped, Metrics) ->
+    counter_metric(?C('messages/qos2/dropped', Metrics));
+emqx_collect(emqx_message_forward, Metrics) ->
+    counter_metric(?C('messages/forward', Metrics));
+emqx_collect(emqx_message_expired, Metrics) ->
+    counter_metric(?C('messages/expired', Metrics)).
 
 emqx_metrics() ->
     [emqx_packets_connect,
