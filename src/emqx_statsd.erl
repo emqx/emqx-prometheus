@@ -252,9 +252,12 @@ emqx_collect(emqx_message_expired, Metrics) ->
     counter_metric(?C('messages/expired', Metrics)).
 
 emqx_metrics() ->
-    [emqx_packets_connect,
+    [emqx_packets_auth,
+     emqx_packets_received,
+     emqx_packets_connect,
      emqx_packets_connack,
-     emqx_packets_disconnect,
+     emqx_packets_disconnect_received,
+     emqx_packets_disconnect_sent,
      emqx_packets_subscribe,
      emqx_packets_suback,
      emqx_packets_unsubscribe,
@@ -263,12 +266,16 @@ emqx_metrics() ->
      emqx_packets_publish_sent,
      emqx_packets_puback_received,
      emqx_packets_puback_sent,
+     emqx_packets_puback_missed,
      emqx_packets_pubrec_received,
      emqx_packets_pubrec_sent,
+     emqx_packets_pubrec_missed,
      emqx_packets_pubrel_received,
      emqx_packets_pubrel_sent,
+     emqx_packets_pubrel_missed,
      emqx_packets_pubcomp_received,
      emqx_packets_pubcomp_sent,
+     emqx_packets_pubcomp_missed,
      emqx_packets_pingreq,
      emqx_packets_pingresp,
      emqx_bytes_received,
@@ -283,8 +290,6 @@ emqx_stats() ->
      emqx_routes_max,
      emqx_sessions_count,
      emqx_sessions_max,
-     emqx_subscribers_count,
-     emqx_subscribers_max,
      emqx_subscriptions_count,
      emqx_subscriptions_max,
      emqx_topics_count,
@@ -300,7 +305,10 @@ emqx_messages() ->
      emqx_messages_qos1_received,
      emqx_messages_qos1_sent,
      emqx_messages_qos2_received,
-     emqx_messages_qos2_sent].
+     emqx_messages_qos2_expired,
+     emqx_messages_qos2_sent,
+     emqx_messages_qos2_forward
+    ].
 
 emqx_vm() ->
     [emqx_vm_cpu_use,
