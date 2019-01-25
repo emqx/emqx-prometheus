@@ -15,3 +15,6 @@ ct.coverdata
 logs/
 data/
 test/ct.cover.spec
+cover/
+erlang.mk
+eunit.coverdata
