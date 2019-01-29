@@ -1,6 +1,6 @@
 PROJECT = emqx_statsd
 PROJECT_DESCRIPTION = Statsd for EMQ X
-PROJECT_VERSION = 3.0
+PROJECT_VERSION = 3.1
 
 NO_AUTOPATCH = prometheus.erl
 
