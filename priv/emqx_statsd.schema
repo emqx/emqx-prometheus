@@ -7,7 +7,7 @@
 
 {mapping, "statsd.interval", "emqx_statsd.interval", [
   {default, 5000},
-  {datatype, integer}
+  {datatype, {duration, ms}}
 ]}.
 
 {mapping, "prometheus.collector.$name", "prometheus.collectors", [
