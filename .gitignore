@@ -18,3 +18,4 @@ test/ct.cover.spec
 cover/
 erlang.mk
 eunit.coverdata
+_build/
