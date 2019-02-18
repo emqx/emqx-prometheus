@@ -1,5 +1,5 @@
 {application,emqx_statsd,
-             [{description, "Statsd for EMQ X"},
+             [{description,"Statsd for EMQ X"},
               {vsn,"git"},
               {modules,[]},
               {registered,[emqx_statsd_sup]},
