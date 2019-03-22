@@ -16,14 +16,18 @@
 
 -behaviour(application).
 
+-emqx_plugin(?MODULE).
+
 %% Application callbacks
--export([start/2, stop/1]).
+-export([ start/2
+        , stop/1
+        ]).
 
 -define(APP, emqx_statsd).
 
 start(_StartType, _StartArgs) ->
-	PushGateway = application:get_env(?APP, push_gateway, "http://127.0.0.1:9091"),
-	Interval = application:get_env(?APP, interval, 5000),
+    PushGateway = application:get_env(?APP, push_gateway, "http://127.0.0.1:9091"),
+    Interval = application:get_env(?APP, interval, 5000),
     emqx_statsd_sup:start_link(PushGateway, Interval).
 
 stop(_State) ->
