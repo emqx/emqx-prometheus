@@ -32,11 +32,19 @@
 -export([start_link/2]).
 
 %% Internal Exports
--export([init/1, handle_call/3, handle_cast/2, handle_info/2, code_change/3,
-         terminate/2]).
+-export([ init/1
+        , handle_call/3
+        , handle_cast/2
+        , handle_info/2
+        , code_change/3
+        , terminate/2
+        ]).
 
 %% prometheus_collector callback
--export([deregister_cleanup/1, collect_mf/2, collect_metrics/2]).
+-export([ deregister_cleanup/1
+        , collect_mf/2
+        , collect_metrics/2
+        ]).
 
 -define(C(K, L), proplists:get_value(K, L, 0)).
 
