@@ -328,8 +328,10 @@ emqx_vm() ->
      emqx_vm_process_messages_in_queues].
 
 emqx_vm_data() ->
-    {_Num, _Use, IdleList, _} = cpu_sup:util([detailed]),
-    Idle = ?C(idle, IdleList),
+    Idle = case cpu_sup:util([detailed]) of
+               {_, 0, 0, _} -> 0; %% Not support for Windows
+               {_Num, _Use, IdleList, _} -> ?C(idle, IdleList)
+           end,
     RunQueue = erlang:statistics(run_queue),
 
     ProcessTotalMessages = lists:foldl(
