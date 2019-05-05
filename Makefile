@@ -18,7 +18,7 @@ eunit: compile
 xref:
 	$(REBAR) xref
 
-clean: clean
+clean: distclean
 
 distclean:
 	@rm -rf _build
