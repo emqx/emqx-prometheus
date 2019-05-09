@@ -1,26 +1,25 @@
-PROJECT = emqx_statsd
-PROJECT_DESCRIPTION = Statsd for EMQ X
+## shallow clone for speed
 
-NO_AUTOPATCH = prometheus.erl
+REBAR_GIT_CLONE_OPTIONS += --depth 1
+export REBAR_GIT_CLONE_OPTIONS
 
-DEPS = prometheus
-dep_prometheus = git-emqx https://github.com/turtleDeng/prometheus.erl v3.1.1
+REBAR = rebar3
+all: compile
 
-CUR_BRANCH := $(shell git branch | grep -e "^*" | cut -d' ' -f 2)
-BRANCH := $(if $(filter $(CUR_BRANCH), master develop), $(CUR_BRANCH), develop)
+compile:
+	$(REBAR) compile
 
-BUILD_DEPS = emqx cuttlefish
-dep_emqx = git-emqx https://github.com/emqx/emqx $(BRANCH)
-dep_cuttlefish = git-emqx https://github.com/emqx/cuttlefish v2.2.1
+ct: compile
+	$(REBAR) as test ct -v
 
-ERLC_OPTS += +debug_info
+eunit: compile
+	$(REBAR) as test eunit
 
-TEST_ERLC_OPTS += +debug_info
+xref:
+	$(REBAR) xref
 
-COVER = true
+clean: distclean
 
-$(shell [ -f erlang.mk ] || curl -s -o erlang.mk https://raw.githubusercontent.com/emqx/erlmk/master/erlang.mk)
-include erlang.mk
-
-app.config::
-	./deps/cuttlefish/cuttlefish -l info -e etc/ -c etc/emqx_statsd.conf -i priv/emqx_statsd.schema -d data
+distclean:
+	@rm -rf _build
+	@rm -f data/app.*.config data/vm.*.args rebar.lock
