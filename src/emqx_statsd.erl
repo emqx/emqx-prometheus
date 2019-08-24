@@ -1,4 +1,5 @@
-%% Copyright (c) 2013-2019 EMQ Technologies Co., Ltd. All Rights Reserved.
+%%--------------------------------------------------------------------
+%% Copyright (c) 2019 EMQ Technologies Co., Ltd. All Rights Reserved.
 %%
 %% Licensed under the Apache License, Version 2.0 (the "License");
 %% you may not use this file except in compliance with the License.
@@ -11,22 +12,25 @@
 %% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 %% See the License for the specific language governing permissions and
 %% limitations under the License.
+%%--------------------------------------------------------------------
 
 -module(emqx_statsd).
-
--include_lib("prometheus/include/prometheus.hrl").
 
 -behaviour(gen_server).
 
 -behaviour(prometheus_collector).
 
--import(prometheus_model_helpers, [create_mf/5,
-                                   gauge_metrics/1,
-                                   gauge_metric/1,
-                                   gauge_metric/2,
-                                   counter_metric/1,
-                                   counter_metric/2,
-                                   counter_metrics/1]).
+-include_lib("prometheus/include/prometheus.hrl").
+
+-import(prometheus_model_helpers,
+        [create_mf/5,
+         gauge_metrics/1,
+         gauge_metric/1,
+         gauge_metric/2,
+         counter_metric/1,
+         counter_metric/2,
+         counter_metrics/1
+        ]).
 
 %% Interface
 -export([start_link/2]).
