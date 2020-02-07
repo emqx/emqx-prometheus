@@ -209,6 +209,8 @@ emqx_collect(emqx_packets_publish_received, Metrics) ->
     counter_metric(?C('packets.publish.received', Metrics));
 emqx_collect(emqx_packets_publish_sent, Metrics) ->
     counter_metric(?C('packets.publish.sent', Metrics));
+emqx_collect(emqx_packets_publish_inuse, Metrics) ->
+    counter_metric(?C('packets.publish.inuse', Metrics));
 emqx_collect(emqx_packets_publish_error, Metrics) ->
     counter_metric(?C('packets.publish.error', Metrics));
 emqx_collect(emqx_packets_publish_auth_error, Metrics) ->
@@ -423,6 +425,7 @@ emqx_metrics_packets() ->
     , emqx_packets_connack_auth_error
     , emqx_packets_publish_received
     , emqx_packets_publish_sent
+    , emqx_packets_publish_inuse
     , emqx_packets_publish_error
     , emqx_packets_publish_auth_error
     , emqx_packets_publish_dropped
