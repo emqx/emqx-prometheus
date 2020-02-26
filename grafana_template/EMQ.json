@@ -90,7 +90,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "emqx_clients_count{instance=\"$host\"}",
+              "expr": "emqx_client_connected{instance=\"$host\"}",
               "format": "time_series",
               "interval": "1m",
               "intervalFactor": 1,
@@ -104,7 +104,7 @@
               "interval": "1m",
               "intervalFactor": 1,
               "legendFormat": "Sessions",
-              "refId": "D",
+              "refId": "B",
               "step": 60
             }
           ],
@@ -183,6 +183,14 @@
               "intervalFactor": 1,
               "legendFormat": "Subscriptions",
               "refId": "A",
+              "step": 60
+            },
+            {
+              "expr": "emqx_subscriptions_shared_count{instance=\"$host\"}",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Subscriptions shared",
+              "refId": "B",
               "step": 60
             }
           ],
@@ -267,11 +275,18 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "emqx_routes_count{instance=\"$host\"}",
+              "expr": "emqx_topics_count{instance=\"$host\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "Topics",
               "refId": "A"
+            }
+            {
+              "expr": "emqx_routes_count{instance=\"$host\"}",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "Routes",
+              "refId": "B"
             }
           ],
           "thresholds": [],
@@ -559,21 +574,30 @@
               "step": 60
             },
             {
-              "expr": "sum(rate(emqx_packets_connack{instance=\"$host\"}[$interval]) or irate(emqx_packets_connack{instance=\"$host\"}[5m]))",
+              "expr": "sum(rate(emqx_packets_connack_sent{instance=\"$host\"}[$interval]) or irate(emqx_packets_connack_sent{instance=\"$host\"}[5m]))",
               "format": "time_series",
               "interval": "$interval",
               "intervalFactor": 1,
-              "legendFormat": "Connack",
+              "legendFormat": "Connack sent",
               "refId": "B",
               "step": 60
             },
             {
-              "expr": "sum(rate(emqx_packets_disconnect{instance=\"$host\"}[$interval]) or irate(emqx_packets_disconnect{instance=\"$host\"}[5m]))",
+              "expr": "sum(rate(emqx_packets_disconnect_received{instance=\"$host\"}[$interval]) or irate(emqx_packets_disconnect_received{instance=\"$host\"}[5m]))",
               "format": "time_series",
               "interval": "$interval",
               "intervalFactor": 1,
-              "legendFormat": "Disconnect",
+              "legendFormat": "Disconnect received",
               "refId": "C",
+              "step": 60
+            },
+            {
+              "expr": "sum(rate(emqx_packets_disconnect_sent{instance=\"$host\"}[$interval]) or irate(emqx_packets_disconnect_sent{instance=\"$host\"}[5m]))",
+              "format": "time_series",
+              "interval": "$interval",
+              "intervalFactor": 1,
+              "legendFormat": "Disconnect sent",
+              "refId": "D",
               "step": 60
             }
           ],
@@ -1068,7 +1092,7 @@
         "multi": false,
         "name": "host",
         "options": [],
-        "query": "label_values(emqx_clients_count, instance)",
+        "query": "label_values(emqx_connections_count, instance)",
         "refresh": 1,
         "regex": "",
         "sort": 1,

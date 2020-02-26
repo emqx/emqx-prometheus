@@ -90,7 +90,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(emqx_clients_count{instance=~\".*\",job=\"emqx\"})",
+              "expr": "sum(emqx_connections_count{instance=~\".*\",job=\"emqx\"})",
               "format": "time_series",
               "instant": false,
               "interval": "1m",
@@ -260,7 +260,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "emqx_routes_count{instance=~\".*\",job=\"emqx\"}",
+              "expr": "emqx_topics_count{instance=~\".*\",job=\"emqx\"}",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "Topics",
