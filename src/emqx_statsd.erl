@@ -21,7 +21,7 @@
 -include_lib("prometheus/include/prometheus.hrl").
 -include_lib("prometheus/include/prometheus_model.hrl").
 
--import(minirest,  [return/1]).
+-import(minirest, [return/1]).
 
 -rest_api(#{name   => stats,
             method => 'GET',
