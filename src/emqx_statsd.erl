@@ -18,19 +18,25 @@
 
 -behaviour(gen_server).
 
--behaviour(prometheus_collector).
-
 -include_lib("prometheus/include/prometheus.hrl").
+-include_lib("prometheus/include/prometheus_model.hrl").
+
+-import(minirest, [return/1]).
+
+-rest_api(#{name   => stats,
+            method => 'GET',
+            path   => "/emqx_statsd",
+            func   => stats,
+            descr  => "Get emqx all stats info"
+           }).
 
 -import(prometheus_model_helpers,
         [ create_mf/5
-        %, gauge_metrics/1
         , gauge_metric/1
-        %, gauge_metric/2
         , counter_metric/1
-        %, counter_metric/2
-        %, counter_metrics/1
         ]).
+
+-export([stats/2]).
 
 %% Interface
 -export([start_link/2]).
@@ -55,6 +61,9 @@
 -define(TIMER_MSG, '#interval').
 
 -record(state, {push_gateway, timer, interval}).
+
+stats(_Bindings, _Params) ->
+    return({ok, collect()}).
 
 start_link(PushGateway, Interval) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [PushGateway, Interval], []).
@@ -100,6 +109,28 @@ collect_mf(_Registry, Callback) ->
     [add_collect_family(Name, Metrics, Callback, counter) || Name <- emqx_metrics_client()],
     [add_collect_family(Name, Metrics, Callback, counter) || Name <- emqx_metrics_session()],
     ok.
+
+collect() ->
+    Metrics = emqx_metrics:all(),
+    Stats = emqx_stats:getstats(),
+    VMData = emqx_vm_data(),
+    [{stats, [collect_stats(Name, Stats) || Name <- emqx_stats()]},
+     {metrics, [collect_stats(Name, VMData) || Name <- emqx_vm()]},
+     {packets, [collect_stats(Name, Metrics) || Name <- emqx_metrics_packets()]},
+     {messages, [collect_stats(Name, Metrics) || Name <- emqx_metrics_messages()]},
+     {delivery, [collect_stats(Name, Metrics) || Name <- emqx_metrics_delivery()]},
+     {client, [collect_stats(Name, Metrics) || Name <- emqx_metrics_client()]},
+     {session, [collect_stats(Name, Metrics) || Name <- emqx_metrics_session()]}].
+
+collect_stats(Name, Stats) ->
+    R = collect_metrics(Name, Stats),
+    case R#'Metric'.gauge of
+        undefined ->
+            {_, Val} = R#'Metric'.counter,
+            {Name, Val};
+        {_, Val} ->
+            {Name, Val}
+    end.
 
 collect_metrics(Name, Metrics) ->
     emqx_collect(Name, Metrics).
