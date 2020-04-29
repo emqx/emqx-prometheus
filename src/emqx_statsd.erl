@@ -17,6 +17,7 @@
 -module(emqx_statsd).
 
 -behaviour(gen_server).
+-behaviour(prometheus_collector).
 
 -include_lib("prometheus/include/prometheus.hrl").
 -include_lib("prometheus/include/prometheus_model.hrl").
