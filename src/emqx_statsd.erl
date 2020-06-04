@@ -553,14 +553,7 @@ emqx_vm_data() ->
            end,
     RunQueue = erlang:statistics(run_queue),
 
-    ProcessTotalMessages = lists:foldl(
-    fun(Pid, Acc) ->
-        case process_info(Pid, message_queue_len) of
-            undefined -> Acc;
-            {message_queue_len, Count} -> Count+Acc
-        end
-    end, 0, processes()),
     [{run_queue, RunQueue},
-     {process_total_messages, ProcessTotalMessages},
+     {process_total_messages, 0}, %% XXX: Plan removed at v5.0
      {cpu_idle, Idle},
      {cpu_use, 100 - Idle}].
