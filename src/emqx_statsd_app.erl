@@ -28,9 +28,20 @@
 -define(APP, emqx_statsd).
 
 start(_StartType, _StartArgs) ->
-    PushGateway = application:get_env(?APP, push_gateway, "http://127.0.0.1:9091"),
-    Interval = application:get_env(?APP, interval, 5000),
-    emqx_statsd_sup:start_link(PushGateway, Interval).
+    SampleTimeInterval = application:get_env(?APP, sample_time_interval, 10000),
+    FlushTimeInterval = application:get_env(?APP, flush_time_interval, 10000),
+    Host = application:get_env(?APP, host, {127, 0, 0, 1}),
+    Port = application:get_env(?APP, port, 8125),
+    Prefix = application:get_env(?APP, prefix, undefined),
+    Tags = application:get_env(?APP, tags, []),
+    BatchSize = application:get_env(?APP, batch_size, 20),
+    ok = estatsd:start_link([{host, Host},
+                             {port, Port},
+                             {prefix, Prefix},
+                             {tags, Tags},
+                             {batch_size, BatchSize}]),
+    emqx_statsd_sup:start_link([{sample_time_interval, SampleTimeInterval},
+                                {flush_time_interval, FlushTimeInterval}]).
 
 stop(_State) ->
     ok.
