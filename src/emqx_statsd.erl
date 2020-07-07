@@ -18,6 +18,11 @@
 
 -behaviour(gen_server).
 
+-ifdef(TEST).
+-compile(export_all).
+-compile(nowarn_export_all).
+-endif.
+
 %% Interface
 -export([start_link/1]).
 
@@ -31,10 +36,10 @@
         ]).
 
 -record(state, {
-          timer,
+          timer :: reference(),
           sample_time_interval :: pos_integer(),
           flush_time_interval :: pos_integer(),
-          cache :: map()
+          cache = #{} :: map()
         }).
 
 start_link(Opts) ->
@@ -42,8 +47,12 @@ start_link(Opts) ->
 
 init([Opts]) ->
     SampleTimeInterval = proplists:get_value(sample_time_interval, Opts),
+    FlushTimeInterval = proplists:get_value(flush_time_interval, Opts),
     Ref = erlang:start_timer(SampleTimeInterval, self(), sample_timeout),
-    {ok, #state{timer = Ref, sample_time_interval = SampleTimeInterval}}.
+    {ok, #state{timer = Ref,
+                sample_time_interval = SampleTimeInterval,
+                flush_time_interval = FlushTimeInterval,
+                cache = #{}}}.
 
 handle_call(_Req, _From, State) ->
     {noreply, State}.
@@ -59,7 +68,7 @@ handle_info({timeout, Ref, sample_timeout}, State = #state{sample_time_interval 
     SampleRate = SampleTimeInterval / FlushTimeInterval,
     {StatsdMetrics, NCache} =
         lists:foldl(fun({StatsdMetricName, Type, RawMetricName}, {StatsdMetricsAcc, CacheAcc}) ->
-                        Value = proplists:get_value(RawMetricName, RawMetrics),
+                        Value = proplists:get_value(RawMetricName, RawMetrics, 0),
                         NValue = case Type of
                                     counter ->
                                         Value - maps:get(StatsdMetricName, CacheAcc, 0);

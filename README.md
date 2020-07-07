@@ -2,11 +2,6 @@
 
 EMQ X Statsd Agent
 
-## Depends
-
-[VmStats](https://github.com/ferd/vmstats)
-[StatsdErl](https://github.com/lpgauth/statsderl)
-
 License
 -------
 

@@ -18,28 +18,27 @@
 
 -behaviour(application).
 
+-include("emqx_statsd.hrl").
+
 -emqx_plugin(?MODULE).
 
-%% Application callbacks
 -export([ start/2
         , stop/1
         ]).
 
--define(APP, emqx_statsd).
-
 start(_StartType, _StartArgs) ->
-    SampleTimeInterval = application:get_env(?APP, sample_time_interval, 10000),
-    FlushTimeInterval = application:get_env(?APP, flush_time_interval, 10000),
-    Host = application:get_env(?APP, host, {127, 0, 0, 1}),
-    Port = application:get_env(?APP, port, 8125),
-    Prefix = application:get_env(?APP, prefix, undefined),
-    Tags = application:get_env(?APP, tags, []),
-    BatchSize = application:get_env(?APP, batch_size, 20),
-    ok = estatsd:start_link([{host, Host},
-                             {port, Port},
-                             {prefix, Prefix},
-                             {tags, Tags},
-                             {batch_size, BatchSize}]),
+    Host = application:get_env(?APP, host, ?DEFAULT_HOST),
+    Port = application:get_env(?APP, port, ?DEFAULT_PORT),
+    Prefix = application:get_env(?APP, prefix, ?DEFAULT_PREFIX),
+    Tags = application:get_env(?APP, tags, ?DEFAULT_TAGS),
+    BatchSize = application:get_env(?APP, batch_size, ?DEFAULT_BATCH_SIZE),
+    estatsd:start_link([{host, Host},
+                        {port, Port},
+                        {prefix, Prefix},
+                        {tags, Tags},
+                        {batch_size, BatchSize}]),
+    SampleTimeInterval = application:get_env(?APP, sample_time_interval, ?DEFAULT_SAMPLE_TIME_INTERVAL),
+    FlushTimeInterval = application:get_env(?APP, flush_time_interval, ?DEFAULT_FLUSH_TIME_INTERVAL),
     emqx_statsd_sup:start_link([{sample_time_interval, SampleTimeInterval},
                                 {flush_time_interval, FlushTimeInterval}]).
 

@@ -26,7 +26,7 @@ start_link(Opts) ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, [Opts]).
 
 init([Opts]) ->
-    {ok, {#{strategy => one_for_one, intensity => 10, period => 100},
+    {ok, {#{strategy  => one_for_one, intensity => 10, period => 100},
           [#{id       => emqx_statsd,
              start    => {emqx_statsd, start_link, [Opts]},
              restart  => permanent,
