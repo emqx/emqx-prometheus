@@ -14,7 +14,7 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
--module(emqx_statsd_app).
+-module(emqx_prometheus_app).
 
 -behaviour(application).
 
@@ -25,12 +25,12 @@
         , stop/1
         ]).
 
--define(APP, emqx_statsd).
+-define(APP, emqx_prometheus).
 
 start(_StartType, _StartArgs) ->
     PushGateway = application:get_env(?APP, push_gateway, "http://127.0.0.1:9091"),
     Interval = application:get_env(?APP, interval, 5000),
-    emqx_statsd_sup:start_link(PushGateway, Interval).
+    emqx_prometheus_sup:start_link(PushGateway, Interval).
 
 stop(_State) ->
     ok.

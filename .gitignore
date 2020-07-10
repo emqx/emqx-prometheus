@@ -10,7 +10,7 @@ rel/example_project
 .concrete/DEV_MODE
 .rebar
 .erlang.mk/
-emqx_statsd.d
+emqx_prometheus.d
 ct.coverdata
 logs/
 data/
