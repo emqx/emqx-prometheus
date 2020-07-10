@@ -1,11 +1,10 @@
-# emqx-statsd
+# emqx-prometheus
 
-EMQ X Statsd Agent
+EMQ X Prometheus Agent
 
 ## Depends
 
 [VmStats](https://github.com/ferd/vmstats)
-[StatsdErl](https://github.com/lpgauth/statsderl)
 
 License
 -------
