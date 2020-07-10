@@ -1,11 +1,11 @@
-%% emqx_statsd config
+%% emqx_prometheus config
 
-{mapping, "statsd.push.gateway.server", "emqx_statsd.push_gateway", [
+{mapping, "prometheus.push.gateway.server", "emqx_prometheus.push_gateway", [
   {default, "http://127.0.0.1:9091"},
   {datatype, string}
 ]}.
 
-{mapping, "statsd.interval", "emqx_statsd.interval", [
+{mapping, "prometheus.interval", "emqx_prometheus.interval", [
   {default, 5000},
   {datatype, integer}
 ]}.

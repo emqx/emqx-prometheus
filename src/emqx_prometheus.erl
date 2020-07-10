@@ -14,7 +14,7 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
--module(emqx_statsd).
+-module(emqx_prometheus).
 
 -behaviour(gen_server).
 
@@ -27,7 +27,7 @@
 
 -rest_api(#{name   => stats,
             method => 'GET',
-            path   => "/emqx_statsd",
+            path   => "/emqx_prometheus",
             func   => stats,
             descr  => "Get emqx all stats info"
            }).

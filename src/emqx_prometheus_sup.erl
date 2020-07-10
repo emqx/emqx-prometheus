@@ -14,9 +14,23 @@
 %% limitations under the License.
 %%--------------------------------------------------------------------
 
--module(emqx_statsd_SUITE).
+-module(emqx_prometheus_sup).
 
--compile(export_all).
+-behaviour(supervisor).
 
-all() ->
-    [].
+-export([start_link/2]).
+
+-export([init/1]).
+
+start_link(PushGateway, Interval) ->
+    supervisor:start_link({local, ?MODULE}, ?MODULE, [PushGateway, Interval]).
+
+init([PushGateway, Interval]) ->
+    {ok, {#{strategy => one_for_one, intensity => 10, period => 100},
+          [#{id       => emqx_prometheus,
+             start    => {emqx_prometheus, start_link, [PushGateway, Interval]},
+             restart  => permanent,
+             shutdown => 5000,
+             type     => worker,
+             modules  => [emqx_prometheus]}]}}.
+
