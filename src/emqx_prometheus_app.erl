@@ -30,7 +30,7 @@
 start(_StartType, _StartArgs) ->
     Port = application:get_env(?APP, port, 9540),
     Endpoint = application:get_env(?APP, endpoint, "/metrics"),
-    emqx_statsd_sup:start_link(Port, Endpoint).
+    emqx_prometheus_sup:start_link(Port, Endpoint).
 
 
 stop(_State) ->

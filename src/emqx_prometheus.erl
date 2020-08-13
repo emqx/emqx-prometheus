@@ -89,7 +89,7 @@ init(Req0, State) ->
 init([Port, Endpoint]) ->
     Dispatch = cowboy_router:compile([
         {'_', [
-            {Endpoint, emqx_statsd, []}
+            {Endpoint, emqx_prometheus, []}
         ]}
     ]),
     case cowboy:start_clear(http, [{port, Port}], #{
