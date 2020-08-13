@@ -22,13 +22,13 @@
 
 -export([init/1]).
 
-start_link(PushGateway, Interval) ->
-    supervisor:start_link({local, ?MODULE}, ?MODULE, [PushGateway, Interval]).
+start_link(Port, Endpoint) ->
+    supervisor:start_link({local, ?MODULE}, ?MODULE, [Port, Endpoint]).
 
-init([PushGateway, Interval]) ->
+init([Port, Endpoint]) ->
     {ok, {#{strategy => one_for_one, intensity => 10, period => 100},
           [#{id       => emqx_prometheus,
-             start    => {emqx_prometheus, start_link, [PushGateway, Interval]},
+             start    => {emqx_prometheus, start_link, [Port, Endpoint]},
              restart  => permanent,
              shutdown => 5000,
              type     => worker,

@@ -22,6 +22,10 @@
 
 -include_lib("prometheus/include/prometheus.hrl").
 -include_lib("prometheus/include/prometheus_model.hrl").
+-include_lib("emqx/include/logger.hrl").
+
+-logger_header("[Prometheus exporter]").
+
 
 -import(minirest, [return/1]).
 
@@ -45,6 +49,7 @@
 
 %% Internal Exports
 -export([ init/1
+        , init/2
         , handle_call/3
         , handle_cast/2
         , handle_info/2
@@ -60,32 +65,46 @@
 
 -define(C(K, L), proplists:get_value(K, L, 0)).
 
--define(TIMER_MSG, '#interval').
 
--record(state, {push_gateway, timer, interval}).
+-record(state, {dispatch}).
 
 stats(_Bindings, _Params) ->
     return({ok, collect()}).
 
-start_link(PushGateway, Interval) ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, [PushGateway, Interval], []).
 
-init([PushGateway, Interval]) ->
-    Ref = erlang:start_timer(Interval, self(), ?TIMER_MSG),
-    {ok, #state{timer = Ref, push_gateway = PushGateway, interval = Interval}}.
+start_link(Port, Endpoint) ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [Port, Endpoint], []).
+
+%% Following init/1 and init/2 implement DIFFERENT logic.
+
+%% Cowboy http handler
+init(Req0, State) ->
+    Req = cowboy_req:reply(200,
+        #{<<"content-type">> => <<"text/plain">>},
+        prometheus_text_format:format(),
+        Req0),
+    {ok, Req, State}.
+
+%% Genserver init
+init([Port, Endpoint]) ->
+    Dispatch = cowboy_router:compile([
+        {'_', [
+            {Endpoint, emqx_statsd, []}
+        ]}
+    ]),
+    case cowboy:start_clear(http, [{port, Port}], #{
+        env => #{dispatch => Dispatch}
+    }) of
+        {ok, _} -> {ok, #state{dispatch = Dispatch}};
+        {error, Reason} -> ?ERROR("Failed to start prometheus exporter, reason=~p", [Reason]),
+            error(Reason)
+    end.
 
 handle_call(_Msg, _From, State) ->
     {noreply, State}.
 
 handle_cast(_Msg, State) ->
     {noreply, State}.
-
-handle_info({timeout, R, ?TIMER_MSG}, S = #state{interval=I, timer=R, push_gateway=Uri}) ->
-    [Name, Ip] = string:tokens(atom_to_list(node()), "@"),
-    Url = lists:concat([Uri, "/metrics/job/", Name, "/instance/",Name, "~", Ip]),
-    Data = prometheus_text_format:format(),
-    httpc:request(post, {Url, [], "text/plain", Data}, [{autoredirect, true}], []),
-    {noreply, S#state{timer = erlang:start_timer(I, self(), ?TIMER_MSG)}};
 
 handle_info(_Msg, State) ->
     {noreply, State}.
