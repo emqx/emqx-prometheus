@@ -64,8 +64,8 @@
 
 -record(state, {push_gateway, timer, interval}).
 
-stats(_Bindings, _Params) ->
-    return({ok, collect()}).
+stats(_Bindings, Params) ->
+    collect(proplists:get_value(<<"type">>, Params, <<"json">>)).
 
 start_link(PushGateway, Interval) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [PushGateway, Interval], []).
@@ -112,17 +112,24 @@ collect_mf(_Registry, Callback) ->
     [add_collect_family(Name, Metrics, Callback, counter) || Name <- emqx_metrics_session()],
     ok.
 
-collect() ->
+collect(<<"json">>) ->
     Metrics = emqx_metrics:all(),
     Stats = emqx_stats:getstats(),
     VMData = emqx_vm_data(),
-    [{stats, [collect_stats(Name, Stats) || Name <- emqx_stats()]},
-     {metrics, [collect_stats(Name, VMData) || Name <- emqx_vm()]},
-     {packets, [collect_stats(Name, Metrics) || Name <- emqx_metrics_packets()]},
-     {messages, [collect_stats(Name, Metrics) || Name <- emqx_metrics_messages()]},
-     {delivery, [collect_stats(Name, Metrics) || Name <- emqx_metrics_delivery()]},
-     {client, [collect_stats(Name, Metrics) || Name <- emqx_metrics_client()]},
-     {session, [collect_stats(Name, Metrics) || Name <- emqx_metrics_session()]}].
+    Data = [{stats, [collect_stats(Name, Stats) || Name <- emqx_stats()]},
+            {metrics, [collect_stats(Name, VMData) || Name <- emqx_vm()]},
+            {packets, [collect_stats(Name, Metrics) || Name <- emqx_metrics_packets()]},
+            {messages, [collect_stats(Name, Metrics) || Name <- emqx_metrics_messages()]},
+            {delivery, [collect_stats(Name, Metrics) || Name <- emqx_metrics_delivery()]},
+            {client, [collect_stats(Name, Metrics) || Name <- emqx_metrics_client()]},
+            {session, [collect_stats(Name, Metrics) || Name <- emqx_metrics_session()]}],
+    return({ok, Data});
+
+collect(<<"prometheus">>) ->
+    Data = prometheus_text_format:format(),
+    {ok, #{<<"content-type">> => <<"text/plain">>}, Data}.
+
+
 
 collect_stats(Name, Stats) ->
     R = collect_metrics(Name, Stats),
@@ -420,7 +427,13 @@ emqx_collect(emqx_vm_run_queue, VMData) ->
     gauge_metric(?C(run_queue, VMData));
 
 emqx_collect(emqx_vm_process_messages_in_queues, VMData) ->
-    gauge_metric(?C(process_total_messages, VMData)).
+    gauge_metric(?C(process_total_messages, VMData));
+
+emqx_collect(emqx_vm_total_memory, VMData) ->
+    gauge_metric(?C(total_memory, VMData));
+
+emqx_collect(emqx_vm_used_memory, VMData) ->
+    gauge_metric(?C(used_memory, VMData)).
 
 %%--------------------------------------------------------------------
 %% Indicators
@@ -544,6 +557,8 @@ emqx_vm() ->
     , emqx_vm_cpu_idle
     , emqx_vm_run_queue
     , emqx_vm_process_messages_in_queues
+    , emqx_vm_total_memory
+    , emqx_vm_used_memory
     ].
 
 emqx_vm_data() ->
@@ -552,8 +567,7 @@ emqx_vm_data() ->
                {_Num, _Use, IdleList, _} -> ?C(idle, IdleList)
            end,
     RunQueue = erlang:statistics(run_queue),
-
     [{run_queue, RunQueue},
      {process_total_messages, 0}, %% XXX: Plan removed at v5.0
      {cpu_idle, Idle},
-     {cpu_use, 100 - Idle}].
+     {cpu_use, 100 - Idle}] ++ emqx_vm:mem_info().
