@@ -35,7 +35,7 @@ erlang_vm_port_limit 1048576
 
 json data
 
-{}{
+{
   "stats": {key:value},
   "metrics": {key:value},
   "packets": {key:value},
