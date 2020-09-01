@@ -1,7 +1,7 @@
+%% -*-: erlang -*-
 %% emqx_prometheus config
 
 {mapping, "prometheus.push.gateway.server", "emqx_prometheus.push_gateway", [
-  {default, "http://127.0.0.1:9091"},
   {datatype, string}
 ]}.
 

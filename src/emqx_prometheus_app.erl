@@ -28,7 +28,7 @@
 -define(APP, emqx_prometheus).
 
 start(_StartType, _StartArgs) ->
-    PushGateway = application:get_env(?APP, push_gateway, "http://127.0.0.1:9091"),
+    PushGateway = application:get_env(?APP, push_gateway, undefined),
     Interval = application:get_env(?APP, interval, 5000),
     emqx_prometheus_sup:start_link(PushGateway, Interval).
 

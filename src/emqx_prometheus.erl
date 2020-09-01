@@ -18,6 +18,8 @@
 
 -behaviour(gen_server).
 
+%% Please don't remove this attribute, it will
+%% be used by the prometheus application
 -behaviour(prometheus_collector).
 
 -include_lib("prometheus/include/prometheus.hrl").
@@ -38,12 +40,13 @@
         , counter_metric/1
         ]).
 
+%% REST APIs
 -export([stats/2]).
 
-%% Interface
+%% APIs
 -export([start_link/2]).
 
-%% Internal Exports
+%% gen_server callbacks
 -export([ init/1
         , handle_call/3
         , handle_cast/2
@@ -64,11 +67,25 @@
 
 -record(state, {push_gateway, timer, interval}).
 
-stats(_Bindings, Params) ->
-    collect(proplists:get_value(<<"type">>, Params, <<"json">>)).
+%%--------------------------------------------------------------------
+%% APIs
+%%--------------------------------------------------------------------
 
 start_link(PushGateway, Interval) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [PushGateway, Interval], []).
+
+%%--------------------------------------------------------------------
+%% REST APIs
+
+stats(_Bindings, Params) ->
+    collect(proplists:get_value(<<"type">>, Params, <<"json">>)).
+
+%%--------------------------------------------------------------------
+%% gen_server callbacks
+%%--------------------------------------------------------------------
+
+init([undefined, Interval]) ->
+    {ok, #state{interval = Interval}};
 
 init([PushGateway, Interval]) ->
     Ref = erlang:start_timer(Interval, self(), ?TIMER_MSG),
@@ -96,6 +113,10 @@ code_change(_OldVsn, State, _Extra) ->
 terminate(_Reason, _State) ->
     ok.
 
+%%--------------------------------------------------------------------
+%% prometheus callbacks
+%%--------------------------------------------------------------------
+
 deregister_cleanup(_Registry) ->
     ok.
 
@@ -112,6 +133,7 @@ collect_mf(_Registry, Callback) ->
     [add_collect_family(Name, Metrics, Callback, counter) || Name <- emqx_metrics_session()],
     ok.
 
+%% @private
 collect(<<"json">>) ->
     Metrics = emqx_metrics:all(),
     Stats = emqx_stats:getstats(),
@@ -129,8 +151,7 @@ collect(<<"prometheus">>) ->
     Data = prometheus_text_format:format(),
     {ok, #{<<"content-type">> => <<"text/plain">>}, Data}.
 
-
-
+%% @private
 collect_stats(Name, Stats) ->
     R = collect_metrics(Name, Stats),
     case R#'Metric'.gauge of
